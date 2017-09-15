@@ -1,0 +1,60 @@
+//Dimensions
+$a: 20px;
+$display: 10 * $a;
+
+//Colors
+$base: #f5f5f5;
+$hover: #fafafa;
+$active: #fff;
+$on: #4c3;
+$off: #e33;
+
+@font-face {
+	font-family: "Roboto";
+	src: url("fonts/Roboto-Light.ttf");
+}
+
+body {
+	font-family: "Roboto";
+	background-color: $off;
+	transition: .5s;
+}
+
+.center {
+	position: absolute; 
+	top: 0; right: 0;
+	bottom: 0; left: 0;
+	margin: auto;
+}
+
+.display {
+	@extend .center;
+	height: $display;
+	width: $display;
+	cursor: pointer;
+	border-radius: 50%;
+	background-color: $base;
+	text-align: center;
+	vertical-align: center;
+	line-height: $display;
+	font-size: $a * 2.5;
+	transition: .5s;
+}
+
+.display:hover {
+	border-radius: 45%;
+	background-color: $hover;
+}
+
+.display:active {
+	border-radius: 40%;
+	background-color: $active;
+}
+
+.on {
+	background-color: $on;
+}
+
+.off {
+	background-color: $off;
+}

@@ -1,3 +1,43 @@
+@font-face {
+  font-family: "Roboto";
+  src: url("fonts/Roboto-Light.ttf"); }
 body {
-	background-color: #f55;
-}
+  font-family: "Roboto";
+  background-color: #e33;
+  transition: .5s; }
+
+.center, .display {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto; }
+
+.display {
+  height: 200px;
+  width: 200px;
+  cursor: pointer;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  text-align: center;
+  vertical-align: center;
+  line-height: 200px;
+  font-size: 50px;
+  transition: .5s; }
+
+.display:hover {
+  border-radius: 45%;
+  background-color: #fafafa; }
+
+.display:active {
+  border-radius: 40%;
+  background-color: #fff; }
+
+.on {
+  background-color: #4c3; }
+
+.off {
+  background-color: #e33; }
+
+/*# sourceMappingURL=style.css.map */

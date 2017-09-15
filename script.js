@@ -16,8 +16,8 @@ if(navigator.mediaDevices) {
 	})
 }
 
-var btn = document.getElementById("btn");
-btn.onclick = function() {
+var display = document.getElementById("display");
+display.onclick = function() {
 	if(connected) {
 		//CONNECT
 		source.disconnect();
