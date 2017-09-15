@@ -1,6 +1,7 @@
 "use strict"
 var context, source;
 var connected = false;
+var interval = 0;
 
 if(navigator.mediaDevices) {
 	navigator.mediaDevices
@@ -23,11 +24,32 @@ display.onclick = function() {
 		source.disconnect();
 		connected = false;
 		document.body.className = "off";
+
+		window.clearInterval(interval);
+
 	} else {
 		//DISCONNECT
 		source.connect(context.destination);
 		connected = true;
 		document.body.className = "on";
+
+		var analyser = context.createAnalyser();
+		analyser.fftSize = 256;
+		source.connect(analyser);
+		var frequencies = 
+			new Float32Array(analyser.frequencyBinCount);
+
+		interval = window.setInterval(
+			function(){
+				analyser.getFloatFrequencyData(frequencies)
+				console.log(frequencies);
+				var sum = 0;
+				for(var i  = 0; i < frequencies.length; i++) {
+					sum += frequencies[i];
+				}
+				console.log(sum / frequencies.length);
+			},
+			1000);
 	}
 }
 
