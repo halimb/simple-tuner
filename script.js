@@ -2,6 +2,9 @@
 var context, source;
 var connected = false;
 var interval = 0;
+var c = document.getElementById("cnv");
+//c.width = 1000;
+var ctx = c.getContext("2d");
 
 if(navigator.mediaDevices) {
 	navigator.mediaDevices
@@ -34,22 +37,27 @@ display.onclick = function() {
 		document.body.className = "on";
 
 		var analyser = context.createAnalyser();
-		analyser.fftSize = 256;
+		analyser.fftSize = 64;
 		source.connect(analyser);
 		var frequencies = 
 			new Float32Array(analyser.frequencyBinCount);
-
+		var barWidth = c.width / frequencies.length;
 		interval = window.setInterval(
 			function(){
 				analyser.getFloatFrequencyData(frequencies)
-				console.log(frequencies);
+				//console.log(frequencies);
 				var sum = 0;
+				c.width = c.width;
 				for(var i  = 0; i < frequencies.length; i++) {
-					sum += frequencies[i];
+					ctx.fillStyle = "rgb(0,0,0)";
+					ctx.fillRect(i * barWidth, 
+								100 + frequencies[i] * -1, 
+								barWidth, 
+								400 - frequencies[i] * -1 );
+					//sum += frequencies[i];
 				}
-				console.log(sum / frequencies.length);
+				//console.log(sum / frequencies.length);
 			},
-			1000);
+			50);
 	}
 }
-

@@ -6,7 +6,7 @@ body {
   background-color: #e33;
   transition: .5s; }
 
-.center, .display {
+.center, .cnv {
   position: absolute;
   top: 0;
   right: 0;
@@ -15,14 +15,14 @@ body {
   margin: auto; }
 
 .display {
-  height: 200px;
-  width: 200px;
+  height: 100px;
+  width: 100px;
   cursor: pointer;
   border-radius: 50%;
   background-color: #f5f5f5;
   text-align: center;
   vertical-align: center;
-  line-height: 200px;
+  line-height: 100px;
   font-size: 50px;
   transition: .5s; }
 
@@ -39,5 +39,9 @@ body {
 
 .off {
   background-color: #e33; }
+
+.cnv {
+  height: 500px;
+  width: 1000px; }
 
 /*# sourceMappingURL=style.css.map */
