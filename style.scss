@@ -1,6 +1,6 @@
 //Dimensions
 $a: 20px;
-$display: 5 * $a;
+$display: 10 * $a;
 
 //Colors
 $base: #f5f5f5;
@@ -28,7 +28,7 @@ body {
 }
 
 .display {
-	//@extend .center;
+	@extend .center;
 	height: $display;
 	width: $display;
 	cursor: pointer;
@@ -60,9 +60,10 @@ body {
 }
 
 .cnv {
-	@extend .center;
-	height: 500px;
-	width: 1000px;
-	//border: 1px solid black;
-	//background: $active;
+	position: absolute;
+	bottom: 0; 
+	left: 0; right: 0;
+	margin: auto;
+	height: $display * 1.75;
+	width: 100%;
 }
