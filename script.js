@@ -34,8 +34,10 @@ display.onclick = function() {
 		document.body.className = "on";
 
 		var analyser = context.createAnalyser();
-		analyser.fftSize = 2048;
+		analyser.fftSize = 4096;
 		source.connect(analyser);
+		analyser.maxDecibels = -10;
+		analyser.minDecibels = -120;
 		analyser.smoothingTimeConstant = .85;
 		console.log(analyser);
 		frequencies = 
@@ -44,33 +46,28 @@ display.onclick = function() {
 		anim();
 	}
 
+			var index = 0;
 	function anim() {
 		if(connected) {
 			analyser.getFloatFrequencyData(frequencies);
-			// var summedFreq = 
-			// 	new Float32Array(analyser.frequencyBinCount);
-			// analyser.getFloatFrequencyData(summedFreq);
-			// for(var i = 0; i < 4; i++) {
-			// 	for(j = 0; j < frequencies.length; j++) {
-			// 		analyser.getFloatFrequencyData(frequencies);
-			// 		summedFreq[i] += frequencies[i]
-			// 	}
-			// 	if(i == 3) {
-			// 		for(var j = 0; j < frequencies.length; j++) {
-			// 			summedFreq[j] /= 3;
-			// 		}
-			// 	}
-			// }
+		
+
+			// var timeDomain = new Uint8Array(analyser.fftSize);
+			// analyser.getByteTimeDomainData(timeDomain);
+			// console.log(timeDomain.length);
 			var sum = 0;
-			var index = 0;
+			var prevIndex = 0;
+			var freq;
 			c.width = c.width;
 			var max = -120;
 			for(var i  = 0; i < frequencies.length; i++) {
-				var freq = frequencies[i];
+				freq = frequencies[i];
 				if(freq > max) {
 					max = freq;
-					index = i;
+					index = i;	
+					prevIndex = index;
 				}
+				sum += prevIndex;
 				freq = Math.exp(Math.sqrt(freq * -1/3.5));
 				ctx.fillStyle = "rgb(0,0,0)";
 				ctx.fillRect(i * barWidth, 
@@ -78,10 +75,12 @@ display.onclick = function() {
 							barWidth + 1, 
 							c.height - freq ); 
 			}
-			display.innerHTML = parseInt(22050 / 1024 * index) + "Hz";
+			var rawFreq = parseInt(44100 / 4096 * (sum / frequencies.length));
+			display.innerHTML = rawFreq //- rawFreq % 10 + "Hz";
 			window.requestAnimationFrame(anim);
 		}
 	}
+
 	var barHeight = -1;
 	function animDown() {
 		c.width = c.width;
