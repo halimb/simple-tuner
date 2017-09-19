@@ -3,6 +3,8 @@ var context, source;
 var connected = false;
 var interval = 0;
 var c = document.getElementById("cnv");
+c.height = window.innerHeight;
+c.width = window.innerWidth;
 var ctx = c.getContext("2d");
 var frequencies;
 if(navigator.mediaDevices) {
@@ -50,14 +52,24 @@ display.onclick = function() {
 	var lastNote = "0";
 	function anim() {
 		if(connected) {
+			var timeDomain = new Uint8Array(analyser.fftSize);
+			analyser.getByteTimeDomainData(timeDomain);
+			var pitch = autoCorrelate(timeDomain, context.sampleRate);
+			var note = noteFromPitch( pitch );
+			var noteName = pitchesArray[note - 12] || lastNote;
+			lastNote = noteName;
+			display.innerHTML = noteName;
+			//updateBackground();
+			window.requestAnimationFrame(anim);
+			
 			analyser.getFloatFrequencyData(frequencies);
-		
 
 			var sum = 0;
 			var prevIndex = 0;
 			var freq;
 			c.width = c.width;
 			var max = -120;
+			var step = 2 * Math.PI / frequencies.length;
 			for(var i  = 0; i < frequencies.length; i++) {
 				freq = frequencies[i];
 				if(freq > max) {
@@ -66,23 +78,23 @@ display.onclick = function() {
 					prevIndex = index;
 				}
 				sum += prevIndex;
-				freq = Math.exp(Math.sqrt(freq * -1/3.5));
+				freq = Math.exp(Math.sqrt(freq * -1/3.5)) / 2;
+				while(freq > 150) {
+					freq /= 2;
+				}
 				ctx.fillStyle = "rgb(0,0,0)";
-				ctx.fillRect(i * barWidth, 
-							freq,
+				// ctx.fillRect(i * barWidth, 
+				//  			freq,
+				//  			barWidth + 1, 
+				//  			c.height - freq );
+				ctx.translate(c.width / 2, c.height / 2); 
+				ctx.rotate(step);
+				ctx.translate( - c.width / 2, - c.height / 2); 
+				ctx.fillRect(c.width / 2, 
+							c.height / 2,
 							barWidth + 1, 
-							c.height - freq ); 
+							freq ); 
 			}
-			//console.log(frequencies);
-			var timeDomain = new Uint8Array(analyser.fftSize);
-			analyser.getByteTimeDomainData(timeDomain);
-			var pitch = autoCorrelate(timeDomain, context.sampleRate);
-			//var rawFreq = parseInt(44100 / 2048 * (sum / frequencies.length));
-			var note = noteFromPitch( pitch );
-			var noteName = pitchesArray[note - 12] || lastNote;
-			lastNote = noteName;
-			display.innerHTML = noteName//rawFreq //- rawFreq % 10 + "Hz";
-			window.requestAnimationFrame(anim);
 		}
 	}
 
@@ -105,6 +117,20 @@ display.onclick = function() {
 		}
 	}
 }
+
+// function updateBackground() {
+// 	if(delta) {
+// 		var d = parseInt(Math.abs(delta * 1.5 * 255));
+// 		console.log(d);
+// 		var r = d * 3;
+// 		var g = 255 - d;
+// 		var b = parseInt(Math.sqrt(d)); 
+// 		console.log(color);
+// 		var color = "rgb(" + r + ", " + g + ", " + b + ")";
+// 		document.body.style.backgroundColor = color;
+// 		console.log(document.body.style.backgroundColor);
+// 	}
+// }
 
     
 
