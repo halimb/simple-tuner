@@ -3,11 +3,10 @@ $a: 20px;
 $display: 10 * $a;
 
 //Colors
-$base: #f5f5f5;
+$base: rgba(0,0,0,0);//#fff;
 $hover: #fafafa;
-$active: #fff;
 $on: #4c3;
-$off: #e33;
+$visual: #44cc33;
 
 @font-face {
 	font-family: "Roboto";
@@ -16,8 +15,9 @@ $off: #e33;
 
 body {
 	font-family: "Roboto";
-	background-color: $off;
+	background-color: $on;
 	transition: .5s;
+	z-index: -1;
 }
 
 .center {
@@ -44,20 +44,6 @@ body {
 
 .display:hover {
 	border-radius: 45%;
-	background-color: $hover;
-}
-
-.display:active {
-	border-radius: 40%;
-	background-color: $active;
-}
-
-.on {
-	background-color: $on;
-}
-
-.off {
-	background-color: $off;
 }
 
 .cnv {
@@ -68,4 +54,5 @@ body {
 	height: 100%;
 	width: 100%;
 	z-index: 0;
+	filter: url("#goo");
 }

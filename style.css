@@ -3,8 +3,9 @@
   src: url("fonts/Roboto-Light.ttf"); }
 body {
   font-family: "Roboto";
-  background-color: #e33;
-  transition: .5s; }
+  background-color: #4c3;
+  transition: .5s;
+  z-index: -1; }
 
 .center, .display {
   position: absolute;
@@ -19,7 +20,7 @@ body {
   width: 200px;
   cursor: pointer;
   border-radius: 50%;
-  background-color: #f5f5f5;
+  background-color: transparent;
   text-align: center;
   vertical-align: center;
   line-height: 200px;
@@ -28,18 +29,7 @@ body {
   z-index: 1; }
 
 .display:hover {
-  border-radius: 45%;
-  background-color: #fafafa; }
-
-.display:active {
-  border-radius: 40%;
-  background-color: #fff; }
-
-.on {
-  background-color: #4c3; }
-
-.off {
-  background-color: #e33; }
+  border-radius: 45%; }
 
 .cnv {
   position: absolute;
@@ -49,6 +39,7 @@ body {
   right: 0;
   height: 100%;
   width: 100%;
-  z-index: 0; }
+  z-index: 0;
+  filter: url("#goo"); }
 
 /*# sourceMappingURL=style.css.map */
