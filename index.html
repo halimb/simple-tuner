@@ -5,7 +5,6 @@
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="style.css">
-        <script type="text/javascript" src="Goo.js"></script>
         <meta name="author" content="Abdel Halim Bouguedra">
         <meta name="viewport" content="width=device-width minimum-scale=1 maximum-scale=1">
     </head>
@@ -16,7 +15,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
           <defs>
             <filter id="goo">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
               <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
               <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
             </filter>

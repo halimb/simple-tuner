@@ -16,14 +16,13 @@ body {
   margin: auto; }
 
 .display {
-  height: 200px;
-  width: 200px;
+  height: 140px;
+  width: 140px;
   cursor: pointer;
   border-radius: 50%;
-  background-color: transparent;
   text-align: center;
   vertical-align: center;
-  line-height: 200px;
+  line-height: 140px;
   font-size: 50px;
   transition: .5s;
   z-index: 1; }

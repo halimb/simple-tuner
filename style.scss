@@ -1,9 +1,9 @@
 //Dimensions
 $a: 20px;
-$display: 10 * $a;
+$display: 7 * $a;
 
 //Colors
-$base: rgba(0,0,0,0);//#fff;
+$base: #fff;
 $hover: #fafafa;
 $on: #4c3;
 $visual: #44cc33;
@@ -33,7 +33,7 @@ body {
 	width: $display;
 	cursor: pointer;
 	border-radius: 50%;
-	background-color: $base;
+	//background-color: $base;
 	text-align: center;
 	vertical-align: center;
 	line-height: $display;
