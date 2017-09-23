@@ -15,6 +15,7 @@ c.height = window.innerHeight;
 var ox = c.width / 2;
 var oy = c.height / 2;
 var ctx = c.getContext("2d");
+var ballRad = 4;
 var ringRad = 70;
 var ringWidth = 2;
 var startAngle = Math.PI / 9;
@@ -92,7 +93,7 @@ function anim() {
 					300 + freq );
 	}
 	var delta = WAD.getDelta();
-	drawDisc(ringRad);
+	drawDisc(ringRad, delta);
 	showDelta(delta);
 	window.requestAnimationFrame(anim);
 }
@@ -116,13 +117,35 @@ function showDelta(delta) {
 	ctx.fillStyle = "#000";
 	ctx.fillText( higherNote, hx, hy );
 	ctx.fillText( lowerNote, lx , ly );
+
+	//Ball angle
+	var arc = ( endAngle - startAngle ) / 2;
+	var theta = Math.PI / 2 - 2 * delta * arc;
+	var bx = ox + Math.cos(theta) * ringRad;
+	var by = oy - Math.sin(theta) * ringRad;
+	ctx.fillStyle = "#000";
+	ctx.beginPath();
+	ctx.ellipse( bx, by, ballRad, ballRad,
+				 0, 0, 2 * Math.PI);
+	ctx.fill();
 }
 
-function drawDisc(radius) {
-	ctx.fillStyle = discColor;
+function drawDisc(radius, delta) {
+	var color = getColor(delta);
+	//console.log(color);
+	ctx.fillStyle = color
 	ctx.beginPath();
 	ctx.ellipse( ox, oy, 
 				 radius, radius, 
 				 0, 0, 2 * Math.PI);
 	ctx.fill();
+}
+
+function getColor(delta) {
+	console.log(delta);
+	var d = Math.abs(delta);
+	var r = 55 + Math.round(200 * 2.5 * d);
+	var g = 100 + Math.round(200 * (2.5 * d - 1));
+	var b = 0;
+	return "rgb(" + r + ", " + g + ", " + b + ")";
 }
