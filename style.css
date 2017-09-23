@@ -1,6 +1,9 @@
 @font-face {
   font-family: "Roboto";
   src: url("fonts/Roboto-Light.ttf"); }
+@font-face {
+  font-family: "Roboto-B";
+  src: url("fonts/Roboto-Bold.ttf"); }
 body {
   font-family: "Roboto";
   background-color: #4c3;

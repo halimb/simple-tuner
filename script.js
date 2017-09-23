@@ -16,11 +16,11 @@ var ox = c.width / 2;
 var oy = c.height / 2;
 var ctx = c.getContext("2d");
 var ringRad = 70;
-var ringWidth = 5;
-var startAngle = Math.PI / 6;
-var endAngle = 5 * Math.PI / 6;
+var ringWidth = 2;
+var startAngle = Math.PI / 9;
+var endAngle = 8 * Math.PI / 9;
 var discColor = "#fff";
-var ringColor = "#000";
+var ringColor = "#5c5";
 
 var display = document.getElementById("display");
 
@@ -91,8 +91,9 @@ function anim() {
 					barWidth, 
 					300 + freq );
 	}
+	var delta = WAD.getDelta();
 	drawDisc(ringRad);
-	showDelta();
+	showDelta(delta);
 	window.requestAnimationFrame(anim);
 }
 
@@ -104,6 +105,17 @@ function showDelta(delta) {
 					 Math.PI, startAngle, endAngle );
 		ctx.stroke();
 	}
+	var higherNote = WAD.getHigher();
+	var lowerNote = WAD.getLower();
+	var hx = ox + Math.cos(startAngle) * ringRad + 15;
+	var hy = oy - Math.sin(startAngle) * ringRad; //+ 15;
+	var lx = 2 * ox - hx;
+	var ly = hy;
+	ctx.font = "16px Roboto-B";
+	ctx.textAlign = "center";
+	ctx.fillStyle = "#000";
+	ctx.fillText( higherNote, hx, hy );
+	ctx.fillText( lowerNote, lx , ly );
 }
 
 function drawDisc(radius) {
