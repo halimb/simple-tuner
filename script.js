@@ -9,28 +9,40 @@ var context, source, analyser,
 	barHeight, prevTheta = 0, lastNote = 0;
 
 // Canvas
-var c = document.getElementById("cnv");
-c.width = window.innerWidth;
-c.height = window.innerHeight;
-var ox = c.width / 2;
-var oy = c.height / 2;
+var w = window.innerWidth;
+var h = window.innerHeight;
+var c = document.getElementById("canvas");
+var vis = document.getElementById("visualization");
 var ctx = c.getContext("2d");
-var ballRad = 6;
-var ringRad = 70;
+var ctxVis = vis.getContext("2d");
+c.width = w;
+c.height = h;
+vis.width = w;
+vis.height = h;
+var ox = w / 2;
+var oy = h / 2;
+var dim = Math.max( h, w);
+var ballRad = dim * .0075;
+var ringRad = dim * .11;
 var ringWidth = 2;
 var startAngle = Math.PI / 9;
 var endAngle = 8 * Math.PI / 9;
 var discColor = "#fff";
-var ringColor = "#5c5";
+var ringColor = "#ccc";
 
 var display = document.getElementById("display");
 
 window.onresize = function() {
-	c.height = window.innerHeight;
-	c.width = window.innerWidth;
-	ox = c.width / 2;
-	oy = c.height / 2;
+	w = window.innerWidth;
+	h = window.innerHeight
+	c.width = w;
+	c.height = h;
+	vis.width = w;
+	vis.height = h;
+	ox = w / 2;
+	oy = h / 2;
 };
+
 
 (function init() {
 	if(navigator.mediaDevices) {
@@ -71,11 +83,12 @@ function anim() {
 
 	//Visualization
 	c.width = c.width;
+	vis.width = vis.width;
 	var freq;
 	var sum = 0;
 	var prevIndex = 0;
 	var len = frequencies.length;
-	var barWidth = 4 * c.width / len;
+	var barWidth = 4 * vis.width / len;
 	var barHeight = 300 + freq;
 	var start = parseInt(len * .1);
 	var end = parseInt(len * .3);
@@ -85,13 +98,11 @@ function anim() {
 
 	for(var i  = start; i < end; i++) {
 		freq = frequencies[i] * 2;
-		ctx.fillStyle = barColor;
-		ctx.translate(ox, oy); 
-		ctx.rotate(step);
-		ctx.translate(-ox, -oy); 
-		ctx.fillRect(ox, oy,
-					barWidth, 
-					300 + freq );
+		ctxVis.fillStyle = barColor;
+		ctxVis.translate(ox, oy); 
+		ctxVis.rotate(step);
+		ctxVis.translate(-ox, -oy); 
+		ctxVis.fillRect(ox, oy, barWidth, 300 + freq );
 	}
 	delta = WAD.getDelta();
 	drawDisc(ringRad);
