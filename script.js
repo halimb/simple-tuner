@@ -1,12 +1,11 @@
 "use strict"
 // Analyser and animation
-var index = 0;
-var interval = 0;
 var connected = false;
-var barColor = "rgb(100,255,100)";//"rgb(48,187,48)";
+var barColor = "rgb(100,255,100)";
 var context, source, analyser, 
-	frequencies, barWidth, delta,
+	frequencies, barWidth, delta, range = 7,
 	barHeight, prevTheta = 0, lastNote = 0;
+var display = document.getElementById("display");
 
 // Canvas
 var w = window.innerWidth;
@@ -15,44 +14,44 @@ var c = document.getElementById("canvas");
 var vis = document.getElementById("visualization");
 var ctx = c.getContext("2d");
 var ctxVis = vis.getContext("2d");
-c.width = w;
-c.height = h;
-vis.width = w;
-vis.height = h;
-var ox = w / 2;
-var oy = h / 2;
-var dim = Math.max( h, w );
-var ballRad = dim * .0075;
-var ringRad = dim * .12;
-var ringWidth = ringRad / 35;
-var visRadius = ringRad * 3.25;
-var startAngle = Math.PI / 3;
-var endAngle = 2 * Math.PI / 3;
-var angleStep = Math.PI / 9;
 var discColor = "#fff";
 var ringColor = "#cfc";
-
-var display = document.getElementById("display");
-
-window.onresize = function() {
-	w = window.innerWidth;
-	h = window.innerHeight
-	c.width = w;
-	c.height = h;
-	vis.width = w;
-	vis.height = h;
-	ox = w / 2;
-	oy = h / 2;
-};
-
+var angleStep = Math.PI / 9;
+var startAngle = Math.PI / 3;
+var endAngle = 2 * Math.PI / 3;
+var mobile, dim, ballRad, ringWidth, 
+	ox, oy, ringRad, visRadius, fontSize;
 
 (function init() {
+	initValues();
 	if(navigator.mediaDevices) {
 		navigator.mediaDevices
 		.getUserMedia({audio: true, video: false})
 		.then( tune )
 	}
 })();
+
+function initValues() {
+	w = window.innerWidth;
+	h = window.innerHeight;
+	mobile = w / h < .8 ? true : false;
+	c.width = w;
+	c.height = h;
+	vis.width = w;
+	vis.height = h;
+	ox = w / 2;
+	oy = h / 2;
+	dim = Math.min( h, w );
+	ballRad = mobile ? dim * .015 : dim * .0075;
+	ringRad = mobile ? dim * .25 : dim * .17;
+	visRadius = dim * .003;
+	ringWidth = dim * .005;
+	fontSize = mobile ? dim * .05 : dim * .035;
+	display.style.fontSize = fontSize * 2 + "px";
+}
+
+window.onresize = initValues;
+
 
 function tune( stream ) {
 	context = new ( window.AudioContext 	|| 
@@ -80,11 +79,15 @@ function anim() {
 	var noteName = WAD.noteFromPitch( pitch ) || lastNote;
 	// > > >
 
+	// Display
+	c.width = c.width;
 	lastNote = noteName;
 	display.innerHTML = noteName;
+	delta = WAD.getDelta();
+	drawDisc(ringRad);
+	showDelta();
 
 	//Visualization
-	c.width = c.width;
 	vis.width = vis.width;
 	var freq, barHeight, barWidth;
 	var sum = 0;
@@ -94,24 +97,22 @@ function anim() {
 	var end = parseInt(len * .3);
 	var step = 2 * Math.PI / ( end - start );
 	analyser.getFloatFrequencyData(frequencies);
-
-
 	for(var i  = start; i < end; i++) {
-		freq = frequencies[i] * 2;
-		barWidth = 4 * vis.width / len;
-		barHeight = visRadius + freq;
+		freq = dim / 4 + frequencies[i];
+		freq += mobile ? 100 : 0;
+		barWidth = mobile ? 12 * w / len : 4 * w / len;
+		barHeight = visRadius * freq;
+		test = barHeight;
 		ctxVis.fillStyle = barColor;
 		ctxVis.translate(ox, oy); 
 		ctxVis.rotate(step);
 		ctxVis.translate(-ox, -oy); 
 		ctxVis.fillRect(ox, oy, barWidth, barHeight );
 	}
-	delta = WAD.getDelta();
-	drawDisc(ringRad);
-	showDelta();
+
 	window.requestAnimationFrame(anim);
 }
-
+var test = 0;
 function showDelta() {
 	var start = 0//startAngle;
 	var end = Math.PI * 2//endAngle;
@@ -128,7 +129,7 @@ function showDelta() {
 	ctx.ellipse(ox, oy - ringRad, 3, 3, 0, 0, 2 * Math.PI);
 	ctx.fill();
 	
-	showNotes(7);
+	showNotes(range);
 
 	animateBall(delta);
 }
@@ -138,21 +139,22 @@ function showNotes(range) {
 	for(var i = -range + 1; i < range; i++) {
 		if( i== 0 ) { continue; }
 		// get coefficient depending on the index
-		var coef =  Math.sqrt(4 * Math.abs(i));
+		var coef =  getCoef(i);
 		// Font settings
 		ctx.textAlign = i > 0 ? "left" : "right";
-		ctx.font = Math.round(30 / Math.sqrt(coef)) + "px Roboto-B";
+		ctx.font = Math.round(fontSize / Math.sqrt(coef)) + "px Roboto-B";
 		
 		var note = WAD.getNeighbour(i);
-		var pos = getNotePosition(i, coef);
+		var pos = getNotePosition(i);
 		ctx.fillText( note, pos.x, pos.y );
 		var x = i > 0 ? ox + pos.dx : ox - pos.dx;
 		drawBall( x, pos.y, ballRad / coef);
 	}
 }
 
-function getNotePosition(index, coef) {
+function getNotePosition(index) {
 	var pos = {};
+	var coef = getCoef(index);
 	// set angle and position
 	var theta = startAngle - angleStep * coef;
 	pos.y = oy - Math.sin( theta ) * ringRad;
@@ -193,4 +195,6 @@ function animateBall() {
 	}
 }
 
-var max = 0;
+function getCoef(i) {
+	return Math.sqrt(4 * Math.abs(i));
+}
