@@ -15,7 +15,7 @@ $visual: #44cc33;
 
 @font-face {
 	font-family: "Roboto-B";
-	src: url("fonts/Roboto-Bold.ttf");
+	src: url("fonts/Roboto-Regular.ttf");
 }
 
 body {
@@ -64,4 +64,5 @@ body {
 .visualization {
 	@extend .cnv;
 	filter: url("#goo");
+	z-index: -1;
 }

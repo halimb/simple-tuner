@@ -3,7 +3,7 @@
   src: url("fonts/Roboto-Light.ttf"); }
 @font-face {
   font-family: "Roboto-B";
-  src: url("fonts/Roboto-Bold.ttf"); }
+  src: url("fonts/Roboto-Regular.ttf"); }
 body {
   font-family: "Roboto";
   background-color: #4c3;
@@ -44,6 +44,7 @@ body {
   z-index: 0; }
 
 .visualization {
-  filter: url("#goo"); }
+  filter: url("#goo");
+  z-index: -1; }
 
 /*# sourceMappingURL=style.css.map */

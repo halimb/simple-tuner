@@ -21,14 +21,16 @@ vis.width = w;
 vis.height = h;
 var ox = w / 2;
 var oy = h / 2;
-var dim = Math.max( h, w);
+var dim = Math.max( h, w );
 var ballRad = dim * .0075;
-var ringRad = dim * .11;
-var ringWidth = 2;
-var startAngle = Math.PI / 9;
-var endAngle = 8 * Math.PI / 9;
+var ringRad = dim * .12;
+var ringWidth = ringRad / 35;
+var visRadius = ringRad * 3.25;
+var startAngle = Math.PI / 3;
+var endAngle = 2 * Math.PI / 3;
+var angleStep = Math.PI / 9;
 var discColor = "#fff";
-var ringColor = "#ccc";
+var ringColor = "#cfc";
 
 var display = document.getElementById("display");
 
@@ -84,12 +86,10 @@ function anim() {
 	//Visualization
 	c.width = c.width;
 	vis.width = vis.width;
-	var freq;
+	var freq, barHeight, barWidth;
 	var sum = 0;
 	var prevIndex = 0;
 	var len = frequencies.length;
-	var barWidth = 4 * vis.width / len;
-	var barHeight = 300 + freq;
 	var start = parseInt(len * .1);
 	var end = parseInt(len * .3);
 	var step = 2 * Math.PI / ( end - start );
@@ -98,11 +98,13 @@ function anim() {
 
 	for(var i  = start; i < end; i++) {
 		freq = frequencies[i] * 2;
+		barWidth = 4 * vis.width / len;
+		barHeight = visRadius + freq;
 		ctxVis.fillStyle = barColor;
 		ctxVis.translate(ox, oy); 
 		ctxVis.rotate(step);
 		ctxVis.translate(-ox, -oy); 
-		ctxVis.fillRect(ox, oy, barWidth, 300 + freq );
+		ctxVis.fillRect(ox, oy, barWidth, barHeight );
 	}
 	delta = WAD.getDelta();
 	drawDisc(ringRad);
@@ -111,8 +113,8 @@ function anim() {
 }
 
 function showDelta() {
-	var start = startAngle;
-	var end = endAngle;
+	var start = 0//startAngle;
+	var end = Math.PI * 2//endAngle;
 
 	for(var i = 0; i < ringWidth; i += .5) {
 		ctx.strokeStyle = ringColor;
@@ -125,28 +127,50 @@ function showDelta() {
 	ctx.beginPath();
 	ctx.ellipse(ox, oy - ringRad, 3, 3, 0, 0, 2 * Math.PI);
 	ctx.fill();
-	var higherNote = WAD.getHigher();
-	var lowerNote = WAD.getLower();
-	var hx = ox + Math.cos(startAngle) * ringRad + 15;
-	var hy = oy - Math.sin(startAngle) * ringRad; //+ 15;
-	var lx = 2 * ox - hx;
-	var ly = hy;
-	ctx.font = "16px Roboto-B";
-	ctx.textAlign = "center";
-	ctx.fillStyle = "#000";
-	ctx.fillText( higherNote, hx, hy );
-	ctx.fillText( lowerNote, lx , ly );
+	
+	showNotes(7);
 
 	animateBall(delta);
 }
 
-function drawDisc(radius) {
-	ctx.fillStyle = "#fff"
+function showNotes(range) {
+	ctx.fillStyle = "#000";
+	for(var i = -range + 1; i < range; i++) {
+		if( i== 0 ) { continue; }
+		// get coefficient depending on the index
+		var coef =  Math.sqrt(4 * Math.abs(i));
+		// Font settings
+		ctx.textAlign = i > 0 ? "left" : "right";
+		ctx.font = Math.round(30 / Math.sqrt(coef)) + "px Roboto-B";
+		
+		var note = WAD.getNeighbour(i);
+		var pos = getNotePosition(i, coef);
+		ctx.fillText( note, pos.x, pos.y );
+		var x = i > 0 ? ox + pos.dx : ox - pos.dx;
+		drawBall( x, pos.y, ballRad / coef);
+	}
+}
+
+function getNotePosition(index, coef) {
+	var pos = {};
+	// set angle and position
+	var theta = startAngle - angleStep * coef;
+	pos.y = oy - Math.sin( theta ) * ringRad;
+	pos.dx = Math.cos( theta )  * ringRad;
+	pos.x = index > 0 ? ox + pos.dx + 5 * Math.sqrt( coef )
+					  : ox - pos.dx - 5 * Math.sqrt( coef );
+	return pos;
+}
+
+function drawBall(x, y, rad) {
 	ctx.beginPath();
-	ctx.ellipse( ox, oy, 
-				 radius, radius, 
-				 0, 0, 2 * Math.PI);
+	ctx.ellipse( x, y, rad, rad, 0, 0, Math.PI * 2);
 	ctx.fill();
+}
+
+function drawDisc(radius) {
+	ctx.fillStyle = discColor;
+	drawBall( ox, oy, radius);
 }
 
 function animateBall() {
@@ -160,7 +184,7 @@ function animateBall() {
 	var by = oy - Math.sin(prevTheta) * ringRad;
 	ctx.fillStyle = "#000";
 	ctx.beginPath();
-	var rad = ballRad * (1 - 1.5 * Math.abs(delta));
+	var rad = ballRad //* (1 - 1 * Math.abs(delta));
 	ctx.ellipse( bx, by, rad, rad,
 				 0, 0, 2 * Math.PI);
 	ctx.fill();
