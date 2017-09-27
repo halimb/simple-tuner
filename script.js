@@ -45,7 +45,7 @@ function initValues() {
 	ballRad = mobile ? dim * .015 : dim * .0075;
 	ringRad = mobile ? dim * .25 : dim * .17;
 	visRadius = dim * .003;
-	ringWidth = dim * .005;
+	ringWidth = 1//dim * .001;
 	fontSize = mobile ? dim * .05 : dim * .035;
 	display.style.fontSize = fontSize * 2 + "px";
 }
@@ -64,7 +64,7 @@ function tune( stream ) {
 		new Float32Array(analyser.frequencyBinCount);
 	anim();
 }
-
+var meanHeight, sum;
 function anim() {
 	//Pitch recognition / note display
 	var timeDomain = new Uint8Array(analyser.fftSize);
@@ -79,14 +79,8 @@ function anim() {
 	var noteName = WAD.noteFromPitch( pitch ) || lastNote;
 	// > > >
 
-	// Display
-	c.width = c.width;
-	lastNote = noteName;
-	display.innerHTML = noteName;
-	delta = WAD.getDelta();
-	drawDisc(ringRad);
-	showDelta();
-
+	sum = 0;
+	
 	//Visualization
 	vis.width = vis.width;
 	var freq, barHeight, barWidth;
@@ -108,7 +102,19 @@ function anim() {
 		ctxVis.rotate(step);
 		ctxVis.translate(-ox, -oy); 
 		ctxVis.fillRect(ox, oy, barWidth, barHeight );
+		sum += barHeight;
 	}
+
+	meanHeight = sum / (end - start);
+
+	// Display
+	c.width = c.width;
+	lastNote = noteName;
+	display.innerHTML = noteName;
+	delta = WAD.getDelta();
+	//drawDisc(ringRad);
+	showDelta();
+
 
 	window.requestAnimationFrame(anim);
 }
@@ -120,7 +126,7 @@ function showDelta() {
 	for(var i = 0; i < ringWidth; i += .5) {
 		ctx.strokeStyle = ringColor;
 		ctx.beginPath();
-		ctx.ellipse( ox, oy, ringRad - i, ringRad - i, 
+		ctx.ellipse( ox, oy, meanHeight - i, meanHeight - i, 
 					 Math.PI, start, end );
 		ctx.stroke();		
 	}
@@ -157,8 +163,8 @@ function getNotePosition(index) {
 	var coef = getCoef(index);
 	// set angle and position
 	var theta = startAngle - angleStep * coef;
-	pos.y = oy - Math.sin( theta ) * ringRad;
-	pos.dx = Math.cos( theta )  * ringRad;
+	pos.y = oy - Math.sin( theta ) * meanHeight//ringRad;
+	pos.dx = Math.cos( theta )  * meanHeight//ringRad;
 	pos.x = index > 0 ? ox + pos.dx + 5 * Math.sqrt( coef )
 					  : ox - pos.dx - 5 * Math.sqrt( coef );
 	return pos;
@@ -184,11 +190,15 @@ function animateBall() {
 	prevTheta += step * sign;
 	var bx = ox + Math.cos(prevTheta) * ringRad;
 	var by = oy - Math.sin(prevTheta) * ringRad;
+	var rad = ballRad;
 	ctx.fillStyle = "#000";
+	ctx.moveTo(bx, by);
 	ctx.beginPath();
-	var rad = ballRad //* (1 - 1 * Math.abs(delta));
 	ctx.ellipse( bx, by, rad, rad,
 				 0, 0, 2 * Math.PI);
+	ctx.moveTo(ox, oy);
+	ctx.ellipse(ox, oy, ringRad, ringRad,
+				0,  - prevTheta - .02,  -prevTheta + .02);
 	ctx.fill();
 	if( Math.abs(theta - prevTheta) > step ) {
 		window.requestAnimationFrame(animateBall)
