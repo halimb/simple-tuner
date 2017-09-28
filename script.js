@@ -4,8 +4,9 @@ var connected = false;
 var barColor = "rgb(100,255,100)";
 var context, source, analyser, 
 	frequencies, barWidth, delta, range = 7,
-	barHeight, prevTheta = 0, lastNote = 0;
+	barHeight, prevTheta = 0, lastNote = "♪", lastPitch = "";
 var display = document.getElementById("display");
+var freqDisplay = document.getElementById("freq");
 
 // Canvas
 var w = window.innerWidth;
@@ -20,7 +21,7 @@ var angleStep = Math.PI / 9;
 var startAngle = Math.PI / 3;
 var endAngle = 2 * Math.PI / 3;
 var mobile, dim, ballRad, ringWidth, 
-	ox, oy, ringRad, visRadius, fontSize;
+	ox, oy, visRadius, fontSize;
 
 (function init() {
 	initValues();
@@ -43,7 +44,7 @@ function initValues() {
 	oy = h / 2;
 	dim = Math.min( h, w );
 	ballRad = mobile ? dim * .015 : dim * .0075;
-	ringRad = mobile ? dim * .25 : dim * .17;
+	meanHeight = mobile ? dim * .25 : dim * .17;
 	visRadius = dim * .003;
 	ringWidth = 1//dim * .001;
 	fontSize = mobile ? dim * .05 : dim * .035;
@@ -77,6 +78,7 @@ function anim() {
 	 * GitHub repo: https://github.com/rserota/wad  */
 	var pitch = WAD.autoCorrelate(timeDomain, context.sampleRate);
 	var noteName = WAD.noteFromPitch( pitch ) || lastNote;
+	pitch = pitch != -1 ? pitch : lastPitch;
 	// > > >
 
 	sum = 0;
@@ -110,9 +112,11 @@ function anim() {
 	// Display
 	c.width = c.width;
 	lastNote = noteName;
+	lastPitch = pitch;
 	display.innerHTML = noteName;
+	freqDisplay.innerHTML = parseInt(lastPitch) + "Hz";
 	delta = WAD.getDelta();
-	//drawDisc(ringRad);
+	//drawDisc(meanHeight);
 	showDelta();
 
 
@@ -132,7 +136,7 @@ function showDelta() {
 	}
 	ctx.fillStyle = "#78c";
 	ctx.beginPath();
-	ctx.ellipse(ox, oy - ringRad, 3, 3, 0, 0, 2 * Math.PI);
+	ctx.ellipse(ox, oy - meanHeight, 3, 3, 0, 0, 2 * Math.PI);
 	ctx.fill();
 	
 	showNotes(range);
@@ -163,8 +167,8 @@ function getNotePosition(index) {
 	var coef = getCoef(index);
 	// set angle and position
 	var theta = startAngle - angleStep * coef;
-	pos.y = oy - Math.sin( theta ) * meanHeight//ringRad;
-	pos.dx = Math.cos( theta )  * meanHeight//ringRad;
+	pos.y = oy - Math.sin( theta ) * meanHeight//meanHeight;
+	pos.dx = Math.cos( theta )  * meanHeight//meanHeight;
 	pos.x = index > 0 ? ox + pos.dx + 5 * Math.sqrt( coef )
 					  : ox - pos.dx - 5 * Math.sqrt( coef );
 	return pos;
@@ -188,8 +192,8 @@ function animateBall() {
 	var theta = Math.PI / 2 - 2 * delta * arc;
 	var sign = theta - prevTheta;
 	prevTheta += step * sign;
-	var bx = ox + Math.cos(prevTheta) * ringRad;
-	var by = oy - Math.sin(prevTheta) * ringRad;
+	var bx = ox + Math.cos(prevTheta) * meanHeight;
+	var by = oy - Math.sin(prevTheta) * meanHeight;
 	var rad = ballRad;
 	ctx.fillStyle = "#000";
 	ctx.moveTo(bx, by);
@@ -197,7 +201,7 @@ function animateBall() {
 	ctx.ellipse( bx, by, rad, rad,
 				 0, 0, 2 * Math.PI);
 	ctx.moveTo(ox, oy);
-	ctx.ellipse(ox, oy, ringRad, ringRad,
+	ctx.ellipse(ox, oy, meanHeight, meanHeight,
 				0,  - prevTheta - .02,  -prevTheta + .02);
 	ctx.fill();
 	if( Math.abs(theta - prevTheta) > step ) {
