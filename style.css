@@ -3,14 +3,17 @@
   src: url("fonts/Roboto-Light.ttf"); }
 @font-face {
   font-family: "Roboto-B";
+  src: url("fonts/Roboto-Bold.ttf"); }
+@font-face {
+  font-family: "Roboto-R";
   src: url("fonts/Roboto-Regular.ttf"); }
 body {
   font-family: "Roboto";
-  background-color: #4c3;
+  background-color: #D32F2F;
   transition: .5s;
   z-index: -1; }
 
-.center, .display {
+.center, .display, .frequency {
   position: absolute;
   top: 0;
   right: 0;
@@ -21,17 +24,22 @@ body {
 .display {
   height: 140px;
   width: 140px;
-  cursor: pointer;
-  border-radius: 50%;
   text-align: center;
   vertical-align: center;
   line-height: 140px;
   font-size: 50px;
-  transition: .5s;
   z-index: 1; }
 
-.display:hover {
-  border-radius: 45%; }
+.frequency {
+  height: 140px;
+  width: 140px;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: center;
+  line-height: 210px;
+  font-size: 16px;
+  z-index: 1;
+  font-family: "Roboto-R"; }
 
 .cnv, .visualization {
   position: absolute;

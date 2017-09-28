@@ -5,8 +5,8 @@ $display: 7 * $a;
 //Colors
 $base: #fff;
 $hover: #fafafa;
-$on: #4c3;
-$visual: #44cc33;
+$on: #D32F2F;//#4c3;
+$visual: #fff;//#44cc33;
 
 @font-face {
 	font-family: "Roboto";
@@ -15,12 +15,18 @@ $visual: #44cc33;
 
 @font-face {
 	font-family: "Roboto-B";
+	src: url("fonts/Roboto-Bold.ttf");
+}
+
+@font-face {
+	font-family: "Roboto-R";
 	src: url("fonts/Roboto-Regular.ttf");
 }
 
 body {
 	font-family: "Roboto";
 	background-color: $on;
+	// color: #fff;
 	transition: .5s;
 	z-index: -1;
 }
@@ -36,19 +42,26 @@ body {
 	@extend .center;
 	height: $display;
 	width: $display;
-	cursor: pointer;
-	border-radius: 50%;
 	//background-color: $base;
 	text-align: center;
 	vertical-align: center;
 	line-height: $display;
 	font-size: $a * 2.5;
-	transition: .5s;
 	z-index: 1;
 }
 
-.freq {
-	line-height: 0;
+.frequency {
+	@extend .center;
+	height: $display;
+	width: $display;
+	cursor: pointer;
+	//background-color: $base;
+	text-align: center;
+	vertical-align: center;
+	line-height: $display * 1.5;
+	font-size: $a * .8;
+	z-index: 1;
+	font-family: "Roboto-R";
 }
 
 .cnv {

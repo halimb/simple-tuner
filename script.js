@@ -1,12 +1,13 @@
 "use strict"
+
 // Analyser and animation
 var connected = false;
-var barColor = "rgb(100,255,100)";
+var barColor = "#fff"//"rgb(100,255,100)";
 var context, source, analyser, 
 	frequencies, barWidth, delta, range = 7,
-	barHeight, prevTheta = 0, lastNote = "♪", lastPitch = "";
+	barHeight, prevTheta = 0, lastNote = 0;
 var display = document.getElementById("display");
-var freqDisplay = document.getElementById("freq");
+var frq = document.getElementById("frequency");
 
 // Canvas
 var w = window.innerWidth;
@@ -15,22 +16,23 @@ var c = document.getElementById("canvas");
 var vis = document.getElementById("visualization");
 var ctx = c.getContext("2d");
 var ctxVis = vis.getContext("2d");
-var discColor = "#fff";
-var ringColor = "#cfc";
+// var discColor = "#fff";
+var ringColor = "rgba(0,0,0,.1)";
 var angleStep = Math.PI / 9;
 var startAngle = Math.PI / 3;
 var endAngle = 2 * Math.PI / 3;
 var mobile, dim, ballRad, ringWidth, 
 	ox, oy, visRadius, fontSize;
 
-(function init() {
+function init() {
 	initValues();
 	if(navigator.mediaDevices) {
 		navigator.mediaDevices
 		.getUserMedia({audio: true, video: false})
 		.then( tune )
 	}
-})();
+}
+window.setTimeout(init, 200);
 
 function initValues() {
 	w = window.innerWidth;
@@ -78,7 +80,6 @@ function anim() {
 	 * GitHub repo: https://github.com/rserota/wad  */
 	var pitch = WAD.autoCorrelate(timeDomain, context.sampleRate);
 	var noteName = WAD.noteFromPitch( pitch ) || lastNote;
-	pitch = pitch != -1 ? pitch : lastPitch;
 	// > > >
 
 	sum = 0;
@@ -107,14 +108,15 @@ function anim() {
 		sum += barHeight;
 	}
 
-	meanHeight = sum / (end - start);
+	meanHeight = Math.abs(sum / (end - start));
 
 	// Display
 	c.width = c.width;
+	if(noteName != lastNote) {
+		display.innerHTML = noteName;
+		frq.innerHTML = Math.round(pitch) + " Hz";
+	}
 	lastNote = noteName;
-	lastPitch = pitch;
-	display.innerHTML = noteName;
-	freqDisplay.innerHTML = parseInt(lastPitch) + "Hz";
 	delta = WAD.getDelta();
 	//drawDisc(meanHeight);
 	showDelta();
@@ -127,17 +129,16 @@ function showDelta() {
 	var start = 0//startAngle;
 	var end = Math.PI * 2//endAngle;
 
-	for(var i = 0; i < ringWidth; i += .5) {
-		ctx.strokeStyle = ringColor;
-		ctx.beginPath();
-		ctx.ellipse( ox, oy, meanHeight - i, meanHeight - i, 
-					 Math.PI, start, end );
-		ctx.stroke();		
-	}
-	ctx.fillStyle = "#78c";
+	ctx.lineWidth = 100;
+	ctx.strokeStyle = ringColor;
 	ctx.beginPath();
-	ctx.ellipse(ox, oy - meanHeight, 3, 3, 0, 0, 2 * Math.PI);
-	ctx.fill();
+	ctx.ellipse( ox, oy, meanHeight, meanHeight, 
+				 Math.PI, start, end );
+	ctx.stroke();		
+
+	// ctx.beginPath();
+	// ctx.ellipse(ox, oy - meanHeight, ballRad, ballRad, 0, 0, 2 * Math.PI);
+	// ctx.stroke();
 	
 	showNotes(range);
 
@@ -152,8 +153,7 @@ function showNotes(range) {
 		var coef =  getCoef(i);
 		// Font settings
 		ctx.textAlign = i > 0 ? "left" : "right";
-		ctx.font = Math.round(fontSize / Math.sqrt(coef)) + "px Roboto-B";
-		
+		ctx.font = Math.round(fontSize / Math.sqrt(coef)) + "px Roboto-R";
 		var note = WAD.getNeighbour(i);
 		var pos = getNotePosition(i);
 		ctx.fillText( note, pos.x, pos.y );
@@ -212,3 +212,4 @@ function animateBall() {
 function getCoef(i) {
 	return Math.sqrt(4 * Math.abs(i));
 }
+
