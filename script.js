@@ -226,9 +226,9 @@ function animateBall() {
 		if( Math.abs(diff) > step ) {
 			window.requestAnimationFrame(move);
 		}
-		else {
-			console.log(color)
-		}
+		// else {
+		// 	console.log(color)
+		// }
 	}
 }
 
