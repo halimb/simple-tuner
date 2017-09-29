@@ -16,7 +16,8 @@ var c = document.getElementById("canvas");
 var vis = document.getElementById("visualization");
 var ctx = c.getContext("2d");
 var ctxVis = vis.getContext("2d");
-// var discColor = "#fff";
+var offPitchColor = "rgba(255, 0, 0, .1)";
+var onPitchColor = "rgba(0, 255, 0, .5)"
 var ringColor = "rgba(0,0,0,.1)";
 var angleStep = Math.PI / 9;
 var startAngle = Math.PI / 3;
@@ -136,8 +137,10 @@ function showDelta() {
 				 Math.PI, start, end );
 	ctx.stroke();		
 
+	// ctx.lineWidth = 5;
+	// ctx.strokeStyle = delta > .1 ? offPitchColor : onPitchColor;
 	// ctx.beginPath();
-	// ctx.ellipse(ox, oy - meanHeight, ballRad, ballRad, 0, 0, 2 * Math.PI);
+	// ctx.ellipse(ox, oy - meanHeight, ballRad * 3, ballRad * 3, 0, 0, 2 * Math.PI);
 	// ctx.stroke();
 	
 	showNotes(range);
@@ -186,26 +189,46 @@ function drawDisc(radius) {
 }
 
 function animateBall() {
-	//Ball angle
-	var step = .01;
-	var arc = ( endAngle - startAngle ) / 2;
-	var theta = Math.PI / 2 - 2 * delta * arc;
-	var sign = theta - prevTheta;
-	prevTheta += step * sign;
-	var bx = ox + Math.cos(prevTheta) * meanHeight;
-	var by = oy - Math.sin(prevTheta) * meanHeight;
-	var rad = ballRad;
-	ctx.fillStyle = "#000";
-	ctx.moveTo(bx, by);
-	ctx.beginPath();
-	ctx.ellipse( bx, by, rad, rad,
-				 0, 0, 2 * Math.PI);
-	ctx.moveTo(ox, oy);
-	ctx.ellipse(ox, oy, meanHeight, meanHeight,
-				0,  - prevTheta - .02,  -prevTheta + .02);
-	ctx.fill();
-	if( Math.abs(theta - prevTheta) > step ) {
-		window.requestAnimationFrame(animateBall)
+	move();
+	function move() {
+		//Ball angle
+		var step = .01;
+		var arc = ( endAngle - startAngle ) / 2;
+		var theta = Math.PI / 2 - 2 * delta * arc;
+		var sign = theta - prevTheta;
+		prevTheta += step * sign;
+		var diff = theta - prevTheta;
+		var bx = ox + Math.cos(prevTheta) * meanHeight;
+		var by = oy - Math.sin(prevTheta) * meanHeight;
+		var rad = ballRad;
+		ctx.fillStyle = "#000";
+		ctx.moveTo(bx, by);
+		ctx.beginPath();
+		ctx.ellipse( bx, by, rad, rad,
+					 0, 0, 2 * Math.PI);
+		ctx.moveTo(ox, oy);
+		ctx.ellipse(ox, oy, meanHeight, meanHeight,
+					0,  - prevTheta - .02,  -prevTheta + .02);
+		ctx.fill();
+
+		//CursorColor
+		var d = Math.abs(delta - diff);
+		var a = Math.abs((1 - d) * .5) ;
+		var g = parseInt(( 1 - d ) * 255);
+		var color = "rgba(0, " + g + ", 0, " + a + ")";
+		var cursorRad =  ballRad * 7 * a;
+		ctx.lineWidth = a * 10;
+		ctx.strokeStyle = color;
+		ctx.beginPath();
+		ctx.ellipse(ox, oy - meanHeight, cursorRad, cursorRad, 0, 0, 2 * Math.PI);
+		ctx.stroke();
+
+		if( Math.abs(diff) > step ) {
+			window.requestAnimationFrame(move);
+		}
+		else {
+			console.log(color)
+		}
 	}
 }
 
