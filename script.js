@@ -50,7 +50,7 @@ function initValues() {
 	meanHeight = mobile ? dim * .25 : dim * .17;
 	visRadius = dim * .003;
 	ringWidth = 1//dim * .001;
-	fontSize = mobile ? dim * .05 : dim * .035;
+	fontSize = mobile ? dim * .05 : dim * .04;
 	display.style.fontSize = fontSize * 2 + "px";
 }
 
@@ -100,7 +100,6 @@ function anim() {
 		freq += mobile ? 100 : 0;
 		barWidth = mobile ? 12 * w / len : 4 * w / len;
 		barHeight = visRadius * freq;
-		test = barHeight;
 		ctxVis.fillStyle = barColor;
 		ctxVis.translate(ox, oy); 
 		ctxVis.rotate(step);
@@ -119,37 +118,16 @@ function anim() {
 	}
 	lastNote = noteName;
 	delta = WAD.getDelta();
-	//drawDisc(meanHeight);
 	showDelta();
-
-
 	window.requestAnimationFrame(anim);
 }
-var test = 0;
+
 function showDelta() {
-	var start = 0//startAngle;
-	var end = Math.PI * 2//endAngle;
-
-	ctx.lineWidth = 100;
-	ctx.strokeStyle = ringColor;
-	ctx.beginPath();
-	ctx.ellipse( ox, oy, meanHeight, meanHeight, 
-				 Math.PI, start, end );
-	ctx.stroke();		
-
-	// ctx.lineWidth = 5;
-	// ctx.strokeStyle = delta > .1 ? offPitchColor : onPitchColor;
-	// ctx.beginPath();
-	// ctx.ellipse(ox, oy - meanHeight, ballRad * 3, ballRad * 3, 0, 0, 2 * Math.PI);
-	// ctx.stroke();
-	
+	smoothAnim();
 	showNotes(range);
-
-	animateBall(delta);
 }
 
 function showNotes(range) {
-	ctx.fillStyle = "#000";
 	for(var i = -range + 1; i < range; i++) {
 		if( i== 0 ) { continue; }
 		// get coefficient depending on the index
@@ -170,8 +148,8 @@ function getNotePosition(index) {
 	var coef = getCoef(index);
 	// set angle and position
 	var theta = startAngle - angleStep * coef;
-	pos.y = oy - Math.sin( theta ) * meanHeight//meanHeight;
-	pos.dx = Math.cos( theta )  * meanHeight//meanHeight;
+	pos.y = oy - Math.sin( theta ) * meanHeight;
+	pos.dx = Math.cos( theta )  * meanHeight;
 	pos.x = index > 0 ? ox + pos.dx + 5 * Math.sqrt( coef )
 					  : ox - pos.dx - 5 * Math.sqrt( coef );
 	return pos;
@@ -183,15 +161,10 @@ function drawBall(x, y, rad) {
 	ctx.fill();
 }
 
-function drawDisc(radius) {
-	ctx.fillStyle = discColor;
-	drawBall( ox, oy, radius);
-}
-
-function animateBall() {
+function smoothAnim() {
 	move();
 	function move() {
-		//Ball angle
+		// Cursor ball
 		var step = .01;
 		var arc = ( endAngle - startAngle ) / 2;
 		var theta = Math.PI / 2 - 2 * delta * arc;
@@ -211,28 +184,39 @@ function animateBall() {
 					0,  - prevTheta - .02,  -prevTheta + .02);
 		ctx.fill();
 
-		//CursorColor
+		// Center pitch indicator ring
 		var d = Math.abs(delta - diff);
 		var a = Math.abs((1 - d) * .5) ;
 		var g = parseInt(( 1 - d ) * 255);
-		var color = "rgba(0, " + g + ", 0, " + a + ")";
-		var cursorRad =  ballRad * 7 * a;
-		ctx.lineWidth = a * 10;
-		ctx.strokeStyle = color;
+		var pitchRingColor = "rgba(0, " + g +
+								 ", 0, " + a + ")";
+		var cursorRad =  ballRad * 6.5 * a;
+		ctx.lineWidth = a * 7;
+		ctx.strokeStyle = pitchRingColor;
 		ctx.beginPath();
-		ctx.ellipse(ox, oy - meanHeight, cursorRad, cursorRad, 0, 0, 2 * Math.PI);
+		ctx.ellipse( ox, oy - meanHeight, 
+					cursorRad, cursorRad, 
+						0, 0, 2 * Math.PI);
 		ctx.stroke();
 
+		// Main ring
+		var f = Math.sqrt;
+		var fact = -f(Math.abs(delta)) + 1;
+		g = parseInt( fact * 255 );
+		var mainRingColor = "rgba(0, " + g  + 
+						", 0, " + fact * .35 + ")";
+		ctx.lineWidth = 100;
+		ctx.strokeStyle = mainRingColor;
+		ctx.beginPath();
+		ctx.ellipse( ox, oy, meanHeight, meanHeight, 
+					 Math.PI, 0, Math.PI * 2 );
+		ctx.stroke();
 		if( Math.abs(diff) > step ) {
 			window.requestAnimationFrame(move);
 		}
-		// else {
-		// 	console.log(color)
-		// }
 	}
 }
 
 function getCoef(i) {
 	return Math.sqrt(4 * Math.abs(i));
 }
-
