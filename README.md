@@ -4,4 +4,4 @@ Javascript instrument tuner using [Web Audio](https://developer.mozilla.org/en-U
 
 **Live preview**: [https://halimb.github.io/simple-tuner/](https://halimb.github.io/simple-tuner/)
 
-![screenshot](./tuner.png)
+![screenshot](./tuner.gif)
